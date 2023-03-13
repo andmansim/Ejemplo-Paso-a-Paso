@@ -11,15 +11,15 @@ from aiohttp import *
 from functools import partial
 import html.parser
 
-def wget(uri):
-    parsed = urlparse(uri)
-    with closing (HTTPConnection(parsed.netloc)) as conn:
-        path = parsed.path
+def wget(uri): #Nos devuelve el contenido de la uri
+    parsed = urlparse(uri) #analizamos la uri
+    with closing (HTTPConnection(parsed.netloc)) as conn: #abrimos la uri
+        path = parsed.path #ruta del servidor
         if parsed.query:
             path += '¿?' + parsed.query
-        conn.request('GET', path)
-        response = conn.getresponse()
-        if response.status != 200:
+        conn.request('GET', path) #Envía la consulta al servidor
+        response = conn.getresponse() #Recoge la respuesta
+        if response.status != 200: #Analizamos la respuesta, si es 200 --> bien, 3xx --> redirección, 4xx --> error del cliente, 5xx --> error del servidor
             print(response.reason, file = stderr)
             return
         print('Respuesta correcta')
