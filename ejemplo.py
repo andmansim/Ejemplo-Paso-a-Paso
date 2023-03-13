@@ -67,4 +67,22 @@ async def get_images(session, page_uri):
     async for i in images_uri_gen:
         print('Descargando' %i )
         await download(session, i)
-    
+
+async def main():
+    web_page_uri = "http://www.formation-python.com/"
+    async with ClientSession() as session:
+        await get_images(session, web_page_uri)
+        
+asyncio.run(main())
+
+def write_in_file(name, content):
+    with open(name, 'wb') as file:
+        file.write(content)
+
+async def download1(session, uri):
+    content = await wget(session, uri)
+    if content is None:
+        return None
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, partial(write_in_file, uri.split(sep)[-1], content))
+    return uri
