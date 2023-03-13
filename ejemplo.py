@@ -12,22 +12,23 @@ from functools import partial
 import html.parser
 
 async def wget(session, uri): #Nos devuelve el contenido de la uri
-    
+    print('Goliwis')
     async with session.get(uri) as response: #abrimos la uri
-
         if response.status != 200: #Analizamos la respuesta, si es 200 --> bien, 3xx --> redirección, 4xx --> error del cliente, 5xx --> error del servidor
             return None
         if response.content_type.startswith('text/'):
             return await response.text()
         else:
-            
-            return
+            return await response.read()
 
 
 async def get_images_scr_from_html(doc_html): #nos da el scr de las imágenes
     soup = BeautifulSoup(doc_html, 'html.parser') #analizador de la página 
-    for img in soup.find_all('img'):
-        yield img.get('scr')
+    print('hi')
+    for img in soup.find_all('src'):
+        print('pataat')
+        print(img.get)
+        yield img.get('src')
         await asyncio.sleep(0.001)
     
 async def download(session, uri): #cogemos las imágenes descaragdas y las guardamos en un archivo del disco duro
@@ -50,7 +51,7 @@ async def get_uri_from_images_scr(base_uri, images_src): #Nos da las uri de las 
                 if parsed.path == '/':
                     path = '/' + path 
                 else:
-                    path = '/' + '/'.join(parsed.path.split('/')[:1]) + '' + path
+                    path = '/' + '/'.join(parsed.path.split('/')[:1]) +'/' + path
             yield parsed.scheme + '://' + parsed.netloc + path
         else:  
             yield parsed.geturl()  
@@ -65,7 +66,7 @@ async def get_images(session, page_uri):
     images_uri_gen = get_uri_from_images_scr(page_uri, images_src_gen)
     #recuperamos las imágenes
     async for i in images_uri_gen:
-        print('Descargando' %i )
+        print("Descargando"  %i )
         await download(session, i)
 
 async def main():
