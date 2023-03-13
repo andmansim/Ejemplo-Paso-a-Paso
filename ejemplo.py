@@ -7,7 +7,7 @@ from bs4 import*
 from os import sep
 from timeit import *
 import asyncio
-from aoihttp import*
+from aiohttp import*
 from functools import partial
 import html.parser
 
@@ -25,19 +25,19 @@ async def wget(session, uri): #Nos devuelve el contenido de la uri
 
 
 async def get_images_scr_from_html(doc_html): #nos da el scr de las imágenes
-    soup = BeautifulSoup(doc_html, 'html.parser')
+    soup = BeautifulSoup(doc_html, 'html.parser') #analizador de la página 
     for img in soup.find_all('img'):
         yield img.get('scr')
         await asyncio.sleep(0.001)
     
-async def download(session, uri):
+async def download(session, uri): #cogemos las imágenes descaragdas y las guardamos en un archivo del disco duro
     content = await wget(session, uri)
     if content is None:
         with open(uri.split(sep)[-1], 'wb') as f:
             f.write(content)
             return uri
 
-async def get_uri_from_images_scr(base_uri, images_src):
+async def get_uri_from_images_scr(base_uri, images_src): #Nos da las uri de las imágenes a descargar
     parsed = urlparse(base_uri)
     
     async for src in images_src:
@@ -75,11 +75,14 @@ async def main():
         
 asyncio.run(main())
 
-def write_in_file(name, content):
+
+#Hay una parte del código que es bloqueante, entonces para no esperar tanto vamos a escribir las siguientes funciones
+#Divide el tiempo en 3
+def write_in_file(name, content): #administra la parte bloqueante
     with open(name, 'wb') as file:
         file.write(content)
 
-async def download1(session, uri):
+async def download1(session, uri): #Ejecutor
     content = await wget(session, uri)
     if content is None:
         return None
