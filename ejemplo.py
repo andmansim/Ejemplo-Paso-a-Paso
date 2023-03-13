@@ -7,13 +7,13 @@ from bs4 import*
 from os import sep
 from timeit import *
 import asyncio
-from aiohttp import *
+from aoihttp import*
 from functools import partial
 import html.parser
 
 def wget(uri): #Nos devuelve el contenido de la uri
     parsed = urlparse(uri) #analizamos la uri
-    with closing (HTTPConnection(parsed.netloc)) as conn: #abrimos la uri
+    with closing(HTTPConnection(parsed.netloc)) as conn: #abrimos la uri
         path = parsed.path #ruta del servidor
         if parsed.query:
             path += '¿?' + parsed.query
@@ -24,4 +24,7 @@ def wget(uri): #Nos devuelve el contenido de la uri
             return
         print('Respuesta correcta')
         return response.read()
-            
+
+def get_images_scr_from_html(doc_html): #nos da el scr de las imágenes
+    soup = BeautifulSoup(doc_html, 'html.parser')
+    return[img.get('src') for img in soup.find_all('img')]
